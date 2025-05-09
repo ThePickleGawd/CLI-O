@@ -1,0 +1,3 @@
+[submodule "third-party/LLaMA-Omni2"]
+	path = third-party/LLaMA-Omni2
+	url = https://github.com/ictnlp/LLaMA-Omni2.git

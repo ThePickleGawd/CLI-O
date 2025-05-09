@@ -2,7 +2,12 @@
 
 Fine-tuned, local LLM for OpenAI Codex CLI. Made for macOS.
 
-# Plan
+# New Plan
+
+- Use Llama-Omni 2 as a voice assistant to understand codebases
+- Integrates with codex, but can simulatenously speek and code
+
+# Old Plan
 
 1. Qwen 3 3B: Finetune
 
