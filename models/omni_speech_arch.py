@@ -21,4 +21,5 @@ class OmniSpeechMetaModel:
         if type(speech_encoder) is list:
             speech_encoder = speech_encoder[0]
         return speech_encoder
-    
+
+"commit farming"
