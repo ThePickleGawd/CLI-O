@@ -2,6 +2,8 @@ import types
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import whisper
+from whisper.model import LayerNorm
 
 
 class WhisperWrappedEncoder:
@@ -10,7 +12,6 @@ class WhisperWrappedEncoder:
     def load(cls, model_config):
 
         def replace_layer_norm(module):
-            from whisper.model import LayerNorm
             for name, child in module.named_children():
                 if isinstance(child, LayerNorm):
                     old_params = child.state_dict()
@@ -20,7 +21,6 @@ class WhisperWrappedEncoder:
                 else:
                     replace_layer_norm(child)
 
-        import whisper
         encoder = whisper.load_model(name=model_config.speech_encoder, device='cpu').encoder
         replace_layer_norm(encoder)
         return encoder
