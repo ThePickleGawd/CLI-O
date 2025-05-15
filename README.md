@@ -1,3 +1,11 @@
+# Newer Plan:
+
+## Improvements after recreating Llama Omni2 exactly
+
+1. Use Qwen3
+2. Use parakeet stt
+3. Use Dia for tts
+
 # CLI-O
 
 Fine-tuned, local LLM for OpenAI Codex CLI. Made for macOS.
