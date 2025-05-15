@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "deepspeed>=0.16.7",
     "nemo>=7.1.4",
     "numba>=0.61.2",
+    "openai-whisper>=20240930",
     "scipy>=1.15.2",
     "sounddevice>=0.5.1",
     "tiktoken>=0.9.0",
