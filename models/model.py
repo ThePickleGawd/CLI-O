@@ -24,11 +24,12 @@ class GateFusionModule(nn.Module):
         self.ffn = nn.Linear(64, 512)
         self.emb = nn.Linear(64, 512)
 
-        self.out = nn.Linear(1, 1) # TODO: Shape
+        self.gate_proj = nn.Linear(128, 512) # TODO: Shape
 
     def forward(self, hidden, y):
         e_hidden = self.ffn(hidden)
         e_emb = self.emb(y)
 
-        out = self.out(torch.concat([e_hidden, e_emb]))
-        return F.sigmoid(out)
+        gate = self.gate_proj(torch.concat([e_hidden, e_emb]))
+        c = gate * e_hidden + (1 - gate) * e_emb
+        return c
