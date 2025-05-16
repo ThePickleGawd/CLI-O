@@ -7,21 +7,19 @@ from transformers.modeling_outputs import CausalLMOutputWithPast
 model_name = "Qwen/Qwen2.5-0.5B-Instruct"
 
 # Load tokenizer and model
-class Omni2SpeechQwen2ForCausalLM(nn.Module):
+class LLM(nn.Module):
     def __init__(self):
         super().__init__()
         self.config = AutoConfig.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        print(self.model)
-
-    def forward(self, input_ids, attention_mask=None):
+    def forward(self, inputs_embeds, attention_mask=None):
         lm_output = self.model(
-            input_ids=input_ids,
+            inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,
             output_hidden_states=True,
-            return_dict=True
+            return_dict=True,
         )
 
         return CausalLMOutputWithPast(
