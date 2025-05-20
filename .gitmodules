@@ -1,3 +1,6 @@
 [submodule "third-party/LLaMA-Omni2"]
 	path = third-party/LLaMA-Omni2
 	url = https://github.com/ictnlp/LLaMA-Omni2.git
+[submodule "third-party/BigVGAN"]
+	path = third-party/BigVGAN
+	url = https://github.com/NVIDIA/BigVGAN
