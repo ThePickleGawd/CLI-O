@@ -16,7 +16,7 @@ def lengths_to_attention_mask(lens):
 class LLMSpeechGenerator(nn.Module):
     def __init__(self, config):
         super(LLMSpeechGenerator, self).__init__()
-        self.model = Qwen2ForCausalLM(Qwen2Config(**config.speech_generator))
+        self.model = Qwen2ForCausalLM(Qwen2Config())
         self.tokenizer = AutoTokenizer.from_pretrained(config.tts_tokenizer)
         self.input_proj = nn.Sequential(
             nn.Linear(config.hidden_size, config.hidden_size * 2),
