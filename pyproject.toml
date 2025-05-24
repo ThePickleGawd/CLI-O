@@ -5,12 +5,18 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "accelerate>=1.7.0",
+    "blobfile>=3.0.0",
     "nemo>=7.1.4",
     "numba>=0.61.2",
     "openai-whisper>=20240930",
+    "optimum>=1.25.3",
+    "pip>=25.1.1",
+    "realtimetts[all,orpheus]>=0.5.5",
     "scipy>=1.15.2",
     "sounddevice>=0.5.1",
     "soundfile>=0.13.1",
+    "streaming-llm",
     "tiktoken>=0.9.0",
     "torch>=2.7.0",
     "torchaudio>=2.7.0",
@@ -18,3 +24,6 @@ dependencies = [
     "transformers>=4.51.3",
     "whisper>=1.1.10",
 ]
+
+[tool.uv.sources]
+streaming-llm = { path = "third-party/streaming-llm", editable = true }

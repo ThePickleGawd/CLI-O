@@ -1,24 +1,32 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch 
 
-model_name = "Qwen/Qwen1.5-1.8B"
+model_name = "Qwen/Qwen2.5-1.5B-Instruct" # Don't use Qwen3 (that uses CoT)
 
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    torch_dtype="auto",
+    device_map="auto"
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code = True)
-model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code = True).to('mps')
-model.config.sliding_window = None
+prompt = "Give me a short introduction to large language model."
+messages = [
+    {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+    {"role": "user", "content": prompt}
+]
+text = tokenizer.apply_chat_template(
+    messages,
+    tokenize=False,
+    add_generation_prompt=True
+)
+model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
+generated_ids = model.generate(
+    **model_inputs,
+    max_new_tokens=512
+)
+generated_ids = [
+    output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+]
 
-def respond_to_input(user_input, system_prompt = "You are a helpful assistant"):
-    prompt = f"<|system|>\n{system_prompt}</s>\n<|user|>\n{user_input}</s>\n<|assistant|>\n"
-
-    inputs = tokenizer(prompt, return_tensors ="pt").to(model.device)
-    outputs = model.generate(**inputs, max_new_tokens=100, do_sample=True, pad_token_id=tokenizer.eos_token_id)
-
-    full_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-    if "<|assistant|>" in full_response:
-        return full_response.split("<|assistant|>")[-1].strip()
-    else:
-        return full_response.strip()
-    
+response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
