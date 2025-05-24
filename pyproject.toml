@@ -12,7 +12,6 @@ dependencies = [
     "openai-whisper>=20240930",
     "optimum>=1.25.3",
     "pip>=25.1.1",
-    "realtimetts[all,orpheus]>=0.5.5",
     "scipy>=1.15.2",
     "sounddevice>=0.5.1",
     "soundfile>=0.13.1",

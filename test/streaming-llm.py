@@ -111,7 +111,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model_name_or_path", type=str, default="Qwen/Qwen3-1.7B-FP8"
+        "--model_name_or_path", type=str, default="Qwen/Qwen2.5-1.5B-Instruct"
     )
     parser.add_argument("--data_root", type=str, default="data/")
     parser.add_argument("--enable_streaming", action="store_true")
