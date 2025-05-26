@@ -6,6 +6,14 @@ from time import sleep
 import time
 import threading
 
+"""
+from langchain.agents import initialize_agent, Tool
+from langchain.agents.agent_types import AgentType
+from langchain.llms import HuggingFacePipeline
+from langchain.tools.tavily_search import TavilySearchResults
+from rag_context_extractor import get_rag_context
+"""
+
 # ============== Init TTS and Warmup =================
 print("Initializing TTS system...")
 engine = KokoroEngine()
@@ -25,6 +33,40 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model.eval()
 
+"""
+llm = HuggingFacePipeline.from_model_id(
+    model_id=model_name,
+    task="text-generation",
+    model_kwargs={"temperature": 0.7, "max_new_tokens": 128}
+)
+
+query_engine = None  
+tavily = TavilySearchResults()
+
+def rag_tool_func(input_text):
+    return get_rag_context(query_engine, input_text)
+
+tools = [
+    Tool(
+        name="RAG Tool",
+        func=rag_tool_func,
+        description="Useful for answering questions about code, repos, or documentation."
+    ),
+    Tool(
+        name="Web Search",
+        func=tavily.run,
+        description="Useful for questions about current events or facts from the internet."
+    )
+]
+
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+"""
+
 messages = [
     {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."}
 ]
@@ -36,6 +78,7 @@ def process_text(text):
     global gen_thread, streamer, messages
 
     messages.append({"role": "user", "content": text})
+
     text_prompt = tokenizer.apply_chat_template(
         messages,
         tokenize=False,
@@ -66,6 +109,7 @@ def process_text(text):
 
 # ================ Main Audio Loop ==============
 if __name__ == '__main__':
+
     print("Wait until it says 'speak now'")
     recorder = AudioToTextRecorder(
         enable_realtime_transcription=True, 
