@@ -11,10 +11,6 @@ print("Initializing TTS system...")
 engine = KokoroEngine()
 stream = TextToAudioStream(engine, frames_per_buffer=256)
 
-print("Performing system warmup...")
-stream.feed("System initialization complete")
-stream.play(muted=True)
-
 # =================== LLM Setup =====================
 model_name = "Qwen/Qwen2.5-1.5B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -25,8 +21,9 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model.eval()
 
+system_prompt = """You are a helpful assistant who responds naturally, like a real person speaking out loud. Start with short, clear sentences to reduce delay in speech. Avoid robotic or overly formal language. Speak conversationally, as if you’re talking to a friend. Keep your sentences concise, especially at the start of a response. Unless told otherwise, use shorter responses. Prioritize natural flow and clarity."""
 messages = [
-    {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."}
+    {"role": "system", "content": system_prompt}
 ]
 
 # Thread & streamer global
@@ -53,8 +50,12 @@ def process_text(text):
     gen_thread.start()
 
     def generator():
+        full_response = ""
         for token in streamer:
+            full_response += token
             yield token
+        messages.append({"role": "assistant", "content": full_response})
+
 
     # Process all test cases automatically
     print("Generating audio...")
