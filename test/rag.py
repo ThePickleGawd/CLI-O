@@ -10,7 +10,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import PromptTemplate
 
 from util import *
-from IPython.display import Markdown, display
+#from IPython.display import Markdown, display
 
 
 
@@ -90,15 +90,16 @@ def setup_query_engine(github_url):
 
 
 
-github_url = "https://github.com/Lightning-AI/LitServe"
+#github_url = "https://github.com/Lightning-AI/LitServe"
 
-query_engine = setup_query_engine(github_url=github_url)
+#query_engine = setup_query_engine(github_url=github_url)
 
 #response = query_engine.query('Can you provide a step by step guide to finetuning an llm using lit-gpt')
 
-retriever = query_engine.retriever
-retriever.similarity_top_k = 4
+#retriever = query_engine.retriever
+#retriever.similarity_top_k = 4
 
+"""
 try:
     nodes = retriever.retrieve('Can you provide a step by step guide to finetuning an llm using lit-gpt')
     context = "\n\n".join([node.node.get_content() for node in nodes])
@@ -106,7 +107,7 @@ try:
 except Exception as e:
     print(f"[RAG Context Retrieval Failed] {e}")
 
-
+"""
 
 
 

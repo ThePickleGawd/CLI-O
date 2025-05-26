@@ -1,6 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
 import threading, time
 from RealtimeTTS import TextToAudioStream, KokoroEngine
+import torch
 
 # ============== Init TTS and Warmup =================
 print("Initializing TTS system...")
@@ -17,9 +18,8 @@ model_name = "Qwen/Qwen2.5-1.5B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
-    torch_dtype="auto",
-    device_map="auto"
-)
+    torch_dtype=torch.float32,
+).to('cpu')
 model.eval()
 
 prompt = "Tell me a story"
@@ -37,7 +37,7 @@ model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
 thread = threading.Thread(
     target=model.generate,
-    kwargs=dict(**model_inputs, streamer=streamer, max_new_tokens=512)
+    kwargs=dict(**model_inputs, streamer=streamer, max_new_tokens=128)
 )
 thread.start()
 
