@@ -7,6 +7,13 @@ requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.7.0",
     "blobfile>=3.0.0",
+    "duckduckgo-search>=8.0.2",
+    "llama-index>=0.12.37",
+    "llama-index-core>=0.12.37",
+    "llama-index-embeddings-huggingface>=0.5.4",
+    "llama-index-llms-ollama>=0.5.6",
+    "llama-index-readers-file>=0.4.7",
+    "mcp[cli]>=1.9.1",
     "nemo>=7.1.4",
     "numba>=0.61.2",
     "openai-whisper>=20240930",
