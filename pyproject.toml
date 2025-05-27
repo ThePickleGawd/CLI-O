@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.7.0",
     "blobfile>=3.0.0",
+    "docker>=7.1.0",
     "duckduckgo-search>=8.0.2",
     "llama-index>=0.12.37",
     "llama-index-core>=0.12.37",
@@ -34,4 +35,11 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-streaming-llm = { path = "third-party/streaming-llm", editable = true }
+streaming-llm = { path = "third_party/streaming-llm" }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mcp", "models", "utils", "tests"]

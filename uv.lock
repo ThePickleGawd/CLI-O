@@ -909,6 +909,20 @@ wheels = [
 ]
 
 [[package]]
+name = "docker"
+version = "7.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "requests" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/91/9b/4a2ea29aeba62471211598dac5d96825bb49348fa07e906ea930394a83ce/docker-7.1.0.tar.gz", hash = "sha256:ad8c70e6e3f8926cb8a92619b832b4ea5299e2831c14284663184e200546fa6c", size = 117834, upload_time = "2024-05-23T11:13:57.216Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e3/26/57c6fb270950d476074c087527a558ccb6f4436657314bfb6cdf484114c4/docker-7.1.0-py3-none-any.whl", hash = "sha256:c96b93b7f0a746f9e77d325bcfb87422a3d8bd4f03136ae8a85b37f1898d5fc0", size = 147774, upload_time = "2024-05-23T11:13:55.01Z" },
+]
+
+[[package]]
 name = "docopt"
 version = "0.6.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1969,10 +1983,11 @@ wheels = [
 [[package]]
 name = "llama-omni2-from-scratch"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "accelerate" },
     { name = "blobfile" },
+    { name = "docker" },
     { name = "duckduckgo-search" },
     { name = "llama-index" },
     { name = "llama-index-core" },
@@ -2003,6 +2018,7 @@ dependencies = [
 requires-dist = [
     { name = "accelerate", specifier = ">=1.7.0" },
     { name = "blobfile", specifier = ">=3.0.0" },
+    { name = "docker", specifier = ">=7.1.0" },
     { name = "duckduckgo-search", specifier = ">=8.0.2" },
     { name = "llama-index", specifier = ">=0.12.37" },
     { name = "llama-index-core", specifier = ">=0.12.37" },
@@ -2020,7 +2036,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.15.2" },
     { name = "sounddevice", specifier = ">=0.5.1" },
     { name = "soundfile", specifier = ">=0.13.1" },
-    { name = "streaming-llm", editable = "third-party/streaming-llm" },
+    { name = "streaming-llm", directory = "third_party/streaming-llm" },
     { name = "tiktoken", specifier = ">=0.9.0" },
     { name = "torch", specifier = ">=2.7.0" },
     { name = "torchaudio", specifier = ">=2.7.0" },
@@ -6608,7 +6624,7 @@ wheels = [
 [[package]]
 name = "streaming-llm"
 version = "0.0.1"
-source = { editable = "third-party/streaming-llm" }
+source = { directory = "third_party/streaming-llm" }
 
 [[package]]
 name = "striprtf"
