@@ -2012,6 +2012,7 @@ dependencies = [
     { name = "tqdm" },
     { name = "transformers" },
     { name = "whisper" },
+    { name = "wikipedia" },
 ]
 
 [package.metadata]
@@ -2043,6 +2044,7 @@ requires-dist = [
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "transformers", specifier = ">=4.51.3" },
     { name = "whisper", specifier = ">=1.1.10" },
+    { name = "wikipedia", specifier = ">=1.4.0" },
 ]
 
 [[package]]
@@ -7165,6 +7167,16 @@ dependencies = [
     { name = "six" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b4/c3/913cdd13ef3d882fa483981378a08cd0f018fd8dd95b6bf006b9bf1cfbc9/whisper-1.1.10.tar.gz", hash = "sha256:435b4fb843c4c752719bdf0511a652d5be710e9bb35ad9ebe3b133268ee31c44", size = 42835, upload_time = "2022-05-22T18:19:54.839Z" }
+
+[[package]]
+name = "wikipedia"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/67/35/25e68fbc99e672127cc6fbb14b8ec1ba3dfef035bf1e4c90f78f24a80b7d/wikipedia-1.4.0.tar.gz", hash = "sha256:db0fad1829fdd441b1852306e9856398204dc0786d2996dd2e0c8bb8e26133b2", size = 27748, upload_time = "2014-11-15T15:59:49.808Z" }
 
 [[package]]
 name = "win32-setctime"

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class ToolABC(ABC):
-    def __init__(self, confirm_action: bool = True, **kwargs):
+    def __init__(self, confirm_action: bool = False, **kwargs):
         self.confirm_action = confirm_action
 
     @property
