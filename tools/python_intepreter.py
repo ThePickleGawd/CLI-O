@@ -15,7 +15,6 @@ class PythonInterpreter(ToolABC):
     def __init__(
         self,
         container_name: str = "python_repl",
-        image_name: str = "agentic_llm_python",
         image: str = "python:3.12",
         persistent_container: bool = True,
         **kwargs,
@@ -23,7 +22,6 @@ class PythonInterpreter(ToolABC):
         super().__init__(**kwargs)
         self.backend = DockerInterface(
             container_name=container_name,
-            image_name=image_name,
             image=image,
             persistent_container=persistent_container,
         )
