@@ -10,7 +10,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
 model.eval()
 
-prompt = "Write and run a Python program that prints 'Hello, world!'. You can use a Python interpreter."
+prompt = "Write a program that prints Hello World. Then search Wikipedia for UCSB. Finally, search the news for Donal Trump and Harvard"
 
 messages = [
     {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
@@ -38,11 +38,10 @@ for token in streamer:
     print(token, end="", flush=True)
     buffer += token
 
-    result = try_parse_tool_calls(buffer)
-    if "tool_calls" in result:
-        print("\n\n🔧 Parsed tool call:\n", result["tool_calls"])
-        for tool_call in result["tool_calls"]:
-            # res = interpreter(tool_call["function"]["arguments"]["code"])
-            res = run_tool_call(tool_call["function"])
-            print(f"Tool Result:\n{res}")
+result = try_parse_tool_calls(buffer)
+if "tool_calls" in result:
+    print("\n\n🔧 Parsed tool call:\n", result["tool_calls"])
+    for tool_call in result["tool_calls"]:
+        res = run_tool_call(tool_call["function"])
+        print(f"Tool Result:\n{res}")
 
