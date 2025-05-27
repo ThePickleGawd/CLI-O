@@ -1,4 +1,4 @@
-import re, json
+import re, json, pipes
 
 def try_parse_tool_calls(content: str):
     """Try parse the tool calls."""
@@ -22,3 +22,14 @@ def try_parse_tool_calls(content: str):
             "tool_calls": tool_calls
         }
     return {"role": "assistant", "content": re.sub(r"<\|im_end\|>$", "", content)}
+
+
+def convert_to_single_line(code_snippet: str) -> str:
+    # from https://stackoverflow.com/a/68203945
+
+    regex = r"^(.+?)#\sBEGIN\s#.+?#\sEND\s#(.+)$"
+    core = re.sub(regex, "\\1\\2", code_snippet, 0, re.MULTILINE | re.DOTALL)
+    escaped = f"{core!r}"
+    outer = pipes.quote(f"exec({escaped})")
+    oneline = f"python -c {outer}"
+    return oneline

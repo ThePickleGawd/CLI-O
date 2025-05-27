@@ -1,6 +1,7 @@
 import re, json, time, threading
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
 from utils.parse import try_parse_tool_calls
+from tools.python_intepreter import PythonInterpreter
 
 # ---- Model Setup ----
 model_name = "Qwen/Qwen2.5-1.5B-Instruct"
@@ -8,21 +9,25 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
 model.eval()
 
-prompt = "What is the weather today in Palo Alto?"
-tools = [{
-    "type": "function",
-    "function": {
-        "name": "get_weather",
-        "description": "Get the current weather in a given location.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {"type": "string", "description": "The city name"}
-            },
-            "required": ["location"]
+prompt = "Write and run a Python program that prints 'Hello, world!'. You can use a Python interpreter."
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "python_interpreter",
+            "description": "Run Python code to perform calculations or process data.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "code": {"type": "string", "description": "The Python code to execute."}
+                },
+                "required": ["code"]
+            }
         }
     }
-}]
+]
+
 
 messages = [
     {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
@@ -44,6 +49,8 @@ thread = threading.Thread(
 )
 thread.start()
 
+interpreter = PythonInterpreter()
+
 # ---- Streaming + Tool Parse ----
 buffer = ""
 for token in streamer:
@@ -53,4 +60,7 @@ for token in streamer:
     result = try_parse_tool_calls(buffer)
     if "tool_calls" in result:
         print("\n\n🔧 Parsed tool call:\n", result["tool_calls"])
-        break  # or continue listening if you're handling multiple tool calls
+        for tool_call in result["tool_calls"]:
+            res = interpreter(tool_call["function"]["arguments"]["code"])
+            print(f"Tool Result:\n{res}")
+
