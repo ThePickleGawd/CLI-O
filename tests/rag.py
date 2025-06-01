@@ -51,7 +51,8 @@ def setup_query_engine(github_url):
 
             try:
                 index = create_index(nodes)
-            except:
+            except Exception as e:
+                print(e)
                 print("FAILED!")
                 index = VectorStoreIndex(nodes=nodes, show_progress=True)
             
