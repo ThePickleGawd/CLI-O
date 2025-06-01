@@ -1,79 +1,57 @@
 from RealtimeSTT import AudioToTextRecorder
 from RealtimeTTS import TextToAudioStream, KokoroEngine
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
-import threading
-from time import sleep
-import time
+from agentS import run_custom_agent
 import threading
 
-# ============== Init TTS and Warmup =================
+# ================== Initialize TTS ==================
 print("Initializing TTS system...")
 engine = KokoroEngine()
 stream = TextToAudioStream(engine, frames_per_buffer=256)
 
-# =================== LLM Setup =====================
-model_name = "Qwen/Qwen2.5-1.5B-Instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    torch_dtype="auto",
-    device_map="auto"
-)
-model.eval()
-
-system_prompt = """You are a helpful assistant who responds naturally, like a real person speaking out loud. Start with short, clear sentences to reduce delay in speech. Avoid robotic or overly formal language. Speak conversationally, as if you’re talking to a friend. Keep your sentences concise, especially at the start of a response. Unless told otherwise, use shorter responses. Prioritize natural flow and clarity."""
-messages = [
-    {"role": "system", "content": system_prompt}
-]
-
-# Thread & streamer global
+# ================== Threaded Agent Response ==================
 gen_thread = None
-streamer = None
+streaming_output = None
+
 def process_text(text):
-    global gen_thread, streamer, messages
+    global gen_thread, streaming_output
 
-    messages.append({"role": "user", "content": text})
-    text_prompt = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True
-    )
-    model_inputs = tokenizer([text_prompt], return_tensors="pt").to(model.device)
-
-    streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    print(f"\n> You said: {text}")
 
     def generate():
-        model.generate(**model_inputs, streamer=streamer, max_new_tokens=128)
+        global streaming_output
+        try:
+            full_response = run_custom_agent(text)
+            print(f"> Agent: {full_response}")
+            streaming_output = full_response
+        except Exception as e:
+            streaming_output = "Sorry, I had trouble processing that."
+            print("Error in agent:", e)
 
-    # Start generation thread
     gen_thread = threading.Thread(target=generate)
     gen_thread.start()
 
     def generator():
-        full_response = ""
-        for token in streamer:
-            full_response += token
+        gen_thread.join()
+        if streaming_output is None:
+            yield "Sorry, I had trouble processing that."
+            return
+        for token in streaming_output:
             yield token
-        messages.append({"role": "assistant", "content": full_response})
 
-
-    # Process all test cases automatically
     print("Generating audio...")
     stream.feed(generator())
     stream.play(log_synthesized_text=True)
+    print("Done.\n")
 
-    print("\nAll generations completed!")
-
-
-# ================ Main Audio Loop ==============
+# ================== Main Loop ==================
 if __name__ == '__main__':
-    print("Wait until it says 'speak now'")
+    print("Say something like 'What is 12 * 7?' or 'Search for Ada Lovelace on Wikipedia.'")
     recorder = AudioToTextRecorder(
-        enable_realtime_transcription=True, 
+        enable_realtime_transcription=True,
         silero_use_onnx=True,
         no_log_file=True,
     )
 
     while True:
-        text = recorder.text() # Do it synchronously unless we wanna interrupt with voice later
+        text = recorder.text()
         process_text(text)
