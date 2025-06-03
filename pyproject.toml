@@ -8,6 +8,7 @@ dependencies = [
     "accelerate>=1.7.0",
     "attention-sinks>=0.1.0",
     "blobfile>=3.0.0",
+    "datasets>=3.6.0",
     "docker>=7.1.0",
     "duckduckgo-search>=8.0.2",
     "langchain>=0.3.25",

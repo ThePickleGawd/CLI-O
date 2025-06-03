@@ -9,3 +9,4 @@ past_key_values = SinkCache(window_length=256, num_sink_tokens=4)
 out = model.generate(**inputs, do_sample=False, max_new_tokens=30, past_key_values=past_key_values)
 res = tokenizer.batch_decode(out, skip_special_tokens=True)[0]
 print(res)
+
