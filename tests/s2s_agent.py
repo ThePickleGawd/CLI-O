@@ -1,7 +1,9 @@
 from RealtimeSTT import AudioToTextRecorder
 from RealtimeTTS import TextToAudioStream, KokoroEngine
-from agentS import run_custom_agent
+#from agentS import run_custom_agent
+from langgraph_test import run_agent
 import threading
+import time
 
 # ================== Initialize TTS ==================
 print("Initializing TTS system...")
@@ -11,16 +13,17 @@ stream = TextToAudioStream(engine, frames_per_buffer=256)
 # ================== Threaded Agent Response ==================
 gen_thread = None
 streaming_output = None
+first = True
 
 def process_text(text):
-    global gen_thread, streaming_output
+    global gen_thread, streaming_output, first
 
     print(f"\n> You said: {text}")
 
     def generate():
         global streaming_output
         try:
-            full_response = run_custom_agent(text)
+            full_response = run_agent(text)
             print(f"> Agent: {full_response}")
             streaming_output = full_response
         except Exception as e:
@@ -31,11 +34,15 @@ def process_text(text):
     gen_thread.start()
 
     def generator():
+        global first
         gen_thread.join()
         if streaming_output is None:
             yield "Sorry, I had trouble processing that."
             return
         for token in streaming_output:
+            if first:
+                first = False
+                print(time.time() - start)
             yield token
 
     print("Generating audio...")
@@ -54,4 +61,6 @@ if __name__ == '__main__':
 
     while True:
         text = recorder.text()
+        start = time.time()
         process_text(text)
+
