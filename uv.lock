@@ -2165,17 +2165,21 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-core" },
     { name = "langchain-experimental" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
     { name = "llama-index" },
     { name = "llama-index-core" },
     { name = "llama-index-embeddings-huggingface" },
     { name = "llama-index-llms-ollama" },
     { name = "llama-index-readers-file" },
+    { name = "llama-index-vector-stores-qdrant" },
     { name = "mcp", extra = ["cli"] },
     { name = "nemo" },
     { name = "numba" },
     { name = "openai-whisper" },
     { name = "optimum" },
     { name = "pip" },
+    { name = "qdrant-client" },
     { name = "realtimestt" },
     { name = "realtimetts", extra = ["all"] },
     { name = "scipy" },
@@ -2203,17 +2207,21 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3.21" },
     { name = "langchain-core", specifier = ">=0.3.62" },
     { name = "langchain-experimental", specifier = ">=0.3.4" },
+    { name = "langchain-openai", specifier = ">=0.3.18" },
+    { name = "langgraph", specifier = ">=0.4.7" },
     { name = "llama-index", specifier = ">=0.12.37" },
     { name = "llama-index-core", specifier = ">=0.12.37" },
     { name = "llama-index-embeddings-huggingface", specifier = ">=0.5.4" },
     { name = "llama-index-llms-ollama", specifier = ">=0.5.6" },
     { name = "llama-index-readers-file", specifier = ">=0.4.7" },
+    { name = "llama-index-vector-stores-qdrant", specifier = ">=0.6.0" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.9.1" },
     { name = "nemo", specifier = ">=7.1.4" },
     { name = "numba", specifier = ">=0.61.2" },
     { name = "openai-whisper", specifier = ">=20240930" },
     { name = "optimum", specifier = ">=1.25.3" },
     { name = "pip", specifier = ">=25.1.1" },
+    { name = "qdrant-client", specifier = ">=1.12.1" },
     { name = "realtimestt", specifier = ">=0.3.104" },
     { name = "realtimetts", extras = ["all"], specifier = ">=0.5.5" },
     { name = "scipy", specifier = ">=1.15.2" },
@@ -3316,7 +3324,7 @@ wheels = [
 
 [[package]]
 name = "protobuf"
-version = "6.31.0"
+version = "5.29.5"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/13/48/718c1e104a2e89970a8ff3b06d87e152834b576c570a6908f8c17ba88d65/protobuf-6.31.0.tar.gz", hash = "sha256:314fab1a6a316469dc2dd46f993cbbe95c861ea6807da910becfe7475bc26ffe", size = 441644, upload_time = "2025-05-14T17:58:27.862Z" }
 wheels = [
