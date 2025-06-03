@@ -48,7 +48,7 @@ while True:
                 top_p=0.9,
                 temperature=0.8,
                 streamer=streamer,
-                use_cache=False
+                cache_implementation="sliding_window"
             )
 
         # Extract and append assistant response

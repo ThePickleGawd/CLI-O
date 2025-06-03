@@ -1,3 +1,0 @@
-[submodule "third_party/streaming-llm"]
-	path = third_party/streaming-llm
-	url = https://github.com/mit-han-lab/streaming-llm.git
