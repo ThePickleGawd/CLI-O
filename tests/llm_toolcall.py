@@ -10,7 +10,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
 model.eval()
 
-prompt = "Write a program that prints Hello World. Then search Wikipedia for UCSB. Finally, search the news for Donal Trump and Harvard"
+prompt = "Show me you can call a tool and also print normal text. First, say something normal. Then call a tool!"
 
 messages = [
     {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
