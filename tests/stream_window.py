@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer, SinkCache
+from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
 from datasets import load_dataset
 
 # Config
@@ -17,10 +17,9 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 dataset = load_dataset(dataset_name, split="train")
 streamer = TextStreamer(tokenizer, skip_prompt=True)
-past_key_values = SinkCache(window_length=256, num_sink_tokens=4)
 
 # Message history
-messages = [{"role": "user", "content": "I'm going to repeat the same thing to see if I can break you! "}]
+messages = [{"role": "user", "content": "I'm going to repeat the same thing to see if I can break you! " * 1000}]
 
 # Infinite loop
 while True:
@@ -49,8 +48,7 @@ while True:
                 top_p=0.9,
                 temperature=0.8,
                 streamer=streamer,
-                use_cache=True,
-                past_key_values=past_key_values
+                cache_implementation="sliding_window"
             )
 
         # Extract and append assistant response
