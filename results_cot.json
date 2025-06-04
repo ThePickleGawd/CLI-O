@@ -1,0 +1,17 @@
+{
+  "responses": {
+    "What\u2019s the weather like today in San Francisco?": "(Unknown tool: <tool_name>)",
+    "Who won the Super Bowl this year?": "(Unknown tool: <tool_name>)",
+    "Where can I buy a used graphics card online?": "(Unknown tool: <tool_name>)"
+  },
+  "timings": {
+    "What\u2019s the weather like today in San Francisco?": 2.4660987854003906,
+    "Who won the Super Bowl this year?": 6.1823179721832275,
+    "Where can I buy a used graphics card online?": 2.2369182109832764
+  },
+  "summary": {
+    "total_questions": 3,
+    "total_time_seconds": 10.885334968566895,
+    "average_time_seconds": 3.6284449895222983
+  }
+}
