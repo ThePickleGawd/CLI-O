@@ -13,6 +13,8 @@ from langgraph_test import run_agent
 print("Initializing TTS system...")
 engine = KokoroEngine()
 stream = TextToAudioStream(engine, frames_per_buffer=256)
+stream.feed("Warmup complete")
+stream.play(muted=True)
 
 # =================== LLM Setup =====================
 model_name = "Qwen/Qwen2.5-1.5B-Instruct"
@@ -21,7 +23,7 @@ model = AutoModelForCausalLM.from_pretrained(
     model_name,
     torch_dtype="auto",
     device_map="auto"
-)
+).to('mps')
 model.eval()
 
 

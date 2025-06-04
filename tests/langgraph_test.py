@@ -9,6 +9,8 @@ from langgraph.graph import StateGraph, START, END
 from langchain_openai import ChatOpenAI
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
+from transformers import TextIteratorStreamer
+
 
 from rag import *
 
@@ -17,7 +19,7 @@ github_url = "https://github.com/ThePickleGawd/geometry-dash-ai"
 query_engine = setup_query_engine(github_url=github_url)
 
 retriever = query_engine.retriever
-retriever.similarity_top_k = 4
+retriever.similarity_top_k = 8
 
 wiki_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
 
@@ -72,8 +74,7 @@ def llm_call_router(state: State):
     )
     return {"tool": decision.tool} 
 
-def synthesizer(state: State):
-    return 
+def synthesizer(state: State): 
     final_output = llm.invoke(
         [
             SystemMessage(content="Write a final answer given the query and additional context. Make sure the response in concise. 2-3 sentences Maximum"),
@@ -97,7 +98,7 @@ router_builder.add_node("RAGToolCall", RAGToolCall)
 router_builder.add_node("NoToolCall", NoToolCall)
 router_builder.add_node("WikipediaToolCall", WikipediaToolCall)
 router_builder.add_node("llm_call_router", llm_call_router)
-#router_builder.add_node("synthesizer", synthesizer)
+router_builder.add_node("synthesizer", synthesizer)
 
 
 router_builder.add_edge(START, "llm_call_router")
@@ -110,20 +111,20 @@ router_builder.add_conditional_edges(
         "WikipediaTool": "WikipediaToolCall"
     }
 )
-router_builder.add_edge("RAGToolCall", END)
-router_builder.add_edge("NoToolCall", END)
-router_builder.add_edge("WikipediaToolCall", END)
-#router_builder.add_edge("synthesizer", END)
+router_builder.add_edge("RAGToolCall", "synthesizer")
+router_builder.add_edge("NoToolCall", "synthesizer")
+router_builder.add_edge("WikipediaToolCall", "synthesizer")
+router_builder.add_edge("synthesizer", END)
 
 router_workflow = router_builder.compile()
-output = router_workflow.invoke({"input":"Who is Ada Lovelace?"})
+output = router_workflow.invoke({"input":"How is reinforcement Learning used in the geometry dash repo"})
 
-print(output["additionalContext"])
+#print(output["output"].content)
 
 
 def run_agent(input: str):
     output = router_workflow.invoke({"input": input})
-    return output["additionalContext"]
+    return output["output"].content
 
 
 
