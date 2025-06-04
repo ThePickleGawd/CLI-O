@@ -1,0 +1,41 @@
+{
+  "responses": {
+    "What\u2019s the weather like today in San Francisco?": "I don't have direct access to current weather conditions. However, I can help you find this information if you'd like me to look it up using my tools. Would you like me to fetch that for you?",
+    "Who won the Super Bowl this year?": "The Kansas City Chiefs won the Super Bowl in 2024 against the San Francisco 49ers, defeating them 25-22.",
+    "Where can I buy a used graphics card online?": "I don't have direct access to current marketplaces or physical stores, but you could try websites like eBay, Craigslist, or local classifieds in your area where you might find used graphics cards. Additionally, forums dedicated to computer hardware sales and trading often list available items.",
+    "When is the next solar eclipse?": "To determine when the next solar eclipse occurs, I'll use the ddg_search function to find information about upcoming solar eclipses.",
+    "What\u2019s a good sushi restaurant nearby?": "To find a good sushi restaurant nearby, I'll use DuckDuckGo to look up recommendations based on your location. Please provide me with your current location so I can fetch relevant results.",
+    "How do I renew a passport?": "To renew your passport, you should visit a local embassy or consulate of the country where your current passport was issued. They will be able to provide specific instructions on how to apply for a new passport. It's also important to note that passports often require biometric information, so ensure you have any necessary documents ready. If you need further assistance or have other questions about traveling internationally, feel free to ask!",
+    "What\u2019s the cheapest flight from Los Angeles this weekend?": "I don't have direct access to flight booking systems or real-time pricing data. However, I can help you search for popular airlines that offer flights from Los Angeles during the upcoming weekend using web searches. Would you like me to do that?",
+    "What are today\u2019s top news stories?": "I can help you find information on current events by searching the web. Would you like me to look up some recent news stories?",
+    "Who\u2019s performing at Coachella this year?": "According to recent announcements, the 2025 Coachella Valley Music and Arts Festival lineup includes:\n\n- **Headliners**: \n  - **Lady Gaga** \u2013 Returning to Coachella after her iconic 2017 performance, she will headline the Friday shows, delivering a spectacular pop set.\n  - **Green Day** \u2013 Making their Coachella debut, the legendary punk rock band will headline Saturdays with a mix of their classics and newer hits.\n  - **Post Malone** \u2013 Known for his chart-topping tracks and electrifying performances, Post Malone will be part of the lineup, showcasing his diverse musical style.\n\n-",
+    "Where can I watch the latest Marvel movie?": "Based on my research, some of the most anticipated Marvel movies currently being planned include:\n\n- **Thunderbolts**: A standalone film that follows the story of the Thunderbolt Initiative, where various Marvel characters are assigned to Earth to protect humanity from alien threats. It's set to be part of the Marvel Cinematic Universe's Phase 5 and possibly Phase 6.\n\n- **Avengers: Doomsday** and **Spider-Man: Brand New Day**: These are two movies that have been announced but haven't yet been confirmed. They're expected to be included in the Marvel Cinematic Universe's Phase 5.\n\nAdditionally, there are other",
+    "What are common flu symptoms?": "Common flu symptoms include:\n\n- Fever\n- Cough\n- Headache\n- Muscle aches\n- Fatigue\n\nThese symptoms typically develop one to two days after being exposed to the flu virus and generally last five to seven days. However, younger, healthier individuals might experience symptoms for longer periods. Older adults or those with weakened immune systems may require additional time to recover. If you suspect you have the flu, seeking medical attention promptly can help manage its severity and ensure proper treatment.",
+    "What\u2019s the average rent in Seattle?": "I don't have access to live data right now but I can help guide you on how to find that information yourself using web searches. Would you like me to show you some search results or instructions on where to look for it?",
+    "When does school start in New York?": "I don't have access to live updates about current events, but typically, public schools in New York start around late August or early September. For the most accurate and up-to-date information, I recommend checking directly with your local school district or visiting their official website.",
+    "What are the side effects of ibuprofen?": "I'm sorry, but I currently don't have access to specific medical information about the side effects of ibuprofen. For accurate and current details on potential side effects associated with ibuprofen, I recommend checking reputable health resources or consulting with a healthcare professional. Would you like me to look up some general sources online for you?",
+    "Who is the richest person right now?": "According to various sources, the richest person currently could be either Elon Musk or Jeff Bezos, both having net worths exceeding $100 billion. For the most recent and specific details, I would recommend checking the latest rankings from reliable sources such as Bloomberg or Forbes."
+  },
+  "timing": {
+    "individual": {
+      "What\u2019s the weather like today in San Francisco?": 2.9882972240448,
+      "Who won the Super Bowl this year?": 7.694698810577393,
+      "Where can I buy a used graphics card online?": 2.072406053543091,
+      "When is the next solar eclipse?": 1.204543113708496,
+      "What\u2019s a good sushi restaurant nearby?": 1.509617805480957,
+      "How do I renew a passport?": 3.2907891273498535,
+      "What\u2019s the cheapest flight from Los Angeles this weekend?": 2.004042148590088,
+      "What are today\u2019s top news stories?": 1.1913270950317383,
+      "Who\u2019s performing at Coachella this year?": 10.633908033370972,
+      "Where can I watch the latest Marvel movie?": 11.27304196357727,
+      "What are common flu symptoms?": 6.987964153289795,
+      "What\u2019s the average rent in Seattle?": 1.9033172130584717,
+      "When does school start in New York?": 2.1681509017944336,
+      "What are the side effects of ibuprofen?": 2.7273972034454346,
+      "Who is the richest person right now?": 5.855666875839233
+    },
+    "total_questions": 15,
+    "total_time": 63.505167722702026,
+    "average_time": 4.233677848180135
+  }
+}

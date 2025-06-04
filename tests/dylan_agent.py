@@ -27,7 +27,7 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model.eval()
 
-system_prompt = f"""You are a helpful assistant who responds naturally, like a real person speaking out loud. Start with short, clear sentences to reduce delay in speech. Avoid robotic or overly formal language. If a tool call is needed, say which tool you will call, then immediately call it. Today is: {datetime.today().strftime("%Y-%m-%d")}"""
+system_prompt = f"""You are a helpful assistant who responds naturally, like a real person speaking out loud. Start with short, clear sentences to reduce delay in speech. Avoid robotic or overly formal language. If a tool call is needed, say which tool you will call, then immediately call it. If you don't know something, look it up. Today is: {datetime.today().strftime("%Y-%m-%d")}"""
 messages = [
     {"role": "system", "content": system_prompt}
 ]
