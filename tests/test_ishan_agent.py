@@ -1,20 +1,26 @@
+import json
+from pathlib import Path
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from langchain.agents import AgentExecutor, create_react_agent
-from langchain_core.prompts import PromptTemplate
-from langchain_core.tools import Tool
-from langchain_core.messages import AIMessage
 from langchain_core.language_models.chat_models import SimpleChatModel
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_community.tools import DuckDuckGoSearchRun, WikipediaQueryRun
+from langchain_community.utilities import WikipediaAPIWrapper
+from langchain_experimental.tools.python.tool import PythonREPLTool
 from pydantic import PrivateAttr
 
-# ==== Custom Tool Imports ====
-from tools.duckduckgo import DDGSearch
-from tools.wikipedia_summary import WikipediaSummary
-from tools.python_intepreter import PythonInterpreter
-from tools.linux_shell import LinuxShell
+from questions import questions  # expects a file questions.py with `questions = [...]`
 
+# ============ Tools ================
+tools = [
+    DuckDuckGoSearchRun(),
+    WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper()),
+    PythonREPLTool(),
+]
 
-# ==== Qwen Wrapper for LangChain ====
+# ============ Qwen Wrapper =========
 class QwenLangChainWrapper(SimpleChatModel):
     _tokenizer: any = PrivateAttr()
     _model: any = PrivateAttr()
@@ -38,14 +44,14 @@ class QwenLangChainWrapper(SimpleChatModel):
     def predict_messages(self, messages, stop=None, **kwargs):
         prompt = self._convert_messages_to_prompt(messages)
         inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
-        outputs = self._model.generate(**inputs, max_new_tokens=512)
+        outputs = self._model.generate(**inputs, max_new_tokens=256)
         text = self._tokenizer.decode(outputs[0], skip_special_tokens=True)
         return AIMessage(content=text.strip())
 
     def _call(self, messages, stop=None, **kwargs) -> str:
         prompt = self._convert_messages_to_prompt(messages)
         inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
-        outputs = self._model.generate(**inputs, max_new_tokens=512)
+        outputs = self._model.generate(**inputs, max_new_tokens=256)
         return self._tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
     def bind_tools(self, tools):
@@ -55,70 +61,50 @@ class QwenLangChainWrapper(SimpleChatModel):
     def _llm_type(self) -> str:
         return "qwen"
 
-
-# ==== Load Qwen Model ====
-print("Loading Qwen...")
+# ========== Load Model ============
+print("Loading Qwen model...")
 model_name = "Qwen/Qwen2.5-1.5B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
 model.eval()
-
 llm = QwenLangChainWrapper(tokenizer, model)
 
+# ========== Create Agent ===========
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful assistant who responds naturally, like a real person speaking out loud. Start with short, clear sentences to reduce delay in speech. Avoid robotic or overly formal language. Speak conversationally, as if you're talking to a friend. Keep your sentences concise, especially at the start of a response. Unless told otherwise, use shorter responses. Prioritize natural flow and clarity."),
+    ("human", "{input}"),
+    ("placeholder", "{agent_scratchpad}")
+])
+agent = create_tool_calling_agent(llm, tools, prompt=prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-# ==== Wrap Tools ====
-def wrap_tool(name, description, func):
-    return Tool(name=name, description=description, func=func)
+# ========== Run and Save ===========
+output_path = Path("results_cot.json")
+if output_path.exists():
+    with output_path.open("r") as f:
+        results = json.load(f)
+else:
+    results = {}
 
-search_tool = wrap_tool("search", "Search current information using DuckDuckGo.", DDGSearch(max_results=3))
-wiki_tool = wrap_tool("wikipedia", "Get summaries from Wikipedia.", WikipediaSummary(max_results=3))
-python_tool = wrap_tool("python", "Run Python code. Use print(...) to see output.", PythonInterpreter())
-linux_tool = wrap_tool("linux", "Run Linux shell commands.", LinuxShell())
+for idx, question in enumerate(questions):
+    if str(idx) in results:
+        continue  # Skip already answered
 
-tools = [search_tool, wiki_tool, python_tool, linux_tool]
+    print(f"\n🧠 Q{idx+1}: {question}")
+    try:
+        result = agent_executor.invoke({"input": question})
+        results[str(idx)] = {
+            "question": question,
+            "output": result.get("output", "No output")
+        }
+    except Exception as e:
+        results[str(idx)] = {
+            "question": question,
+            "error": str(e)
+        }
 
+    # Save after each question
+    with output_path.open("w") as f:
+        json.dump(results, f, indent=2)
 
-# ==== ReAct Prompt ====
-prompt_template = PromptTemplate.from_template("""
-You are a helpful voice assistant that reasons step by step and uses tools.
-
-You have access to the following tools:
-{tools}
-
-Use the following format:
-
-Question: the input question
-Thought: what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: result of the action
-... (repeat Thought/Action/Action Input/Observation as needed)
-Thought: I now know the final answer
-Final Answer: a short, natural, spoken answer
-
-Begin!
-
-Question: {input}
-{agent_scratchpad}
-""")
-
-
-# ==== Create Agent ====
-agent = create_react_agent(llm, tools, prompt_template)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
-
-
-# ==== Run Example Questions ====
-if __name__ == "__main__":
-    questions = [
-        "What is the square root of 144?",
-        "When was Marie Curie born?",
-        "What’s the weather like in San Francisco today?",
-        "List files in the current folder.",
-        "Generate 3 random numbers between 1 and 100 using Python.",
-    ]
-
-    for q in questions:
-        print(f"\n🧠 Q: {q}")
-        result = agent_executor.invoke({"input": q})
-        print(f"✅ Final Answer: {result['output']}")
+print("✅ All questions evaluated and saved to results_cot.json.")
