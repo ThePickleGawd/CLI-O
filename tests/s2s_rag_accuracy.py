@@ -25,38 +25,29 @@ model.eval()
 system_prompt = """You are a helpful assistant who responds naturally, like a real person speaking out loud. Start with short, clear sentences to reduce delay in speech. Avoid robotic or overly formal language. Speak conversationally, as if you're talking to a friend. Keep your sentences concise, especially at the start of a response. Unless told otherwise, use shorter responses. Prioritize natural flow and clarity."""
 messages = [{"role": "system", "content": system_prompt}]
 
-def save_results(responses, times, output_file="results_langgraph.json"):
-    total_time = sum(times.values())
-    avg_time = total_time / len(times) if times else 0.0
+def save_results(responses, output_file="results_langgraph.json"):
     results = {
-        "responses": responses,
-        "timing": {
-            "individual": times,
-            "total_questions": len(responses),
-            "total_time": total_time,
-            "average_time": avg_time
-        }
+        "responses": responses
     }
-    with open(output_file, 'w') as f:
+    with open(output_file, 'a') as f:
         json.dump(results, f, indent=2)
 
 # ================ Main Processing Loop ==============
 if __name__ == '__main__':
-    print("Starting to process questions...")
-    responses = {}
-    times = {}
+    print("Starting to process Geometry Dash questions...")
 
-    for i, question in enumerate(questions, 1):
-        print(f"\nProcessing question {i}/{len(questions)}: {question}")
-        start = time.time()
+    responses = {}
+
+    gd_questions = questions[-20:]
+    gd_questions = [f"Using the local geometry dash repo, {q}" for q in gd_questions]
+
+    for i, question in enumerate(gd_questions, 1):
+        print(f"\nProcessing question {i}/{len(gd_questions)}: {question}")
         response = run_agent(question)
         print(f"Response: {response}")
-        time_taken = time.time() - start
 
         responses[question] = response
-        times[question] = time_taken
+        save_results(responses)
 
-        print(f"Time taken: {time_taken:.2f} seconds")
-        save_results(responses, times)
+    print("\nAll Geometry Dash questions processed! Results saved to results_langgraph.json")
 
-    print("\nAll questions processed! Results saved to results_langgraph.json")
