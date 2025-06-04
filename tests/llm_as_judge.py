@@ -12,6 +12,7 @@ from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from transformers import TextIteratorStreamer
 from langchain.prompts import ChatPromptTemplate
+import json
 
 
 api_key = os.environ.get("OPENAI_API_KEY")
@@ -62,16 +63,42 @@ prompt_template = ChatPromptTemplate.from_messages(
     ]
 ) 
 
-messages = prompt_template.format_messages(
-    query="what is 1+1",
-    answer1="2",
-    answer2="3",
-    answer3="1+1 is 2"
-)
+clarity_scores = [0.0, 0.0, 0.0]
+depth_scores = [0.0, 0.0, 0.0]
+relevance_scores = [0.0, 0.0, 0.0]
 
-result = structured_llm.invoke(messages)
+with open("results_dylan.json") as f1, open("results_langgraph.json") as f2, open("results_cot.json") as f3:
+    responses1 = json.load(f1)["responses"]
+    responses2 = json.load(f2)["responses"]
+    responses3 = json.load(f3)["responses"]
 
-print(result)
+for i, question in enumerate(responses1):
+    ans1 = responses1[question]
+    ans2 = responses2[question]
+    ans3 = responses3[question]
+
+    messages = prompt_template.format_messages(
+        query=question,
+        answer1=ans1,
+        answer2=ans2,
+        answer3=ans3
+    )
+
+    result = structured_llm.invoke(messages)
+
+    print(result)
+
+    for j, evaluation in enumerate(result.evaluations):
+        clarity_scores[j] += evaluation.clarity_rating / 100
+        depth_scores[j] += evaluation.depth_rating / 100
+        relevance_scores[j] += evaluation.relevance_rating / 100
+
+    print(clarity_scores)
+    print(depth_scores)
+    print(relevance_scores)
+
+
+
 
 
 
