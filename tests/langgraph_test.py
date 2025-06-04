@@ -13,6 +13,7 @@ from transformers import TextIteratorStreamer
 
 
 from rag import *
+from tools import tool_instances
 
 github_url = "https://github.com/ThePickleGawd/geometry-dash-ai"
 
@@ -27,9 +28,12 @@ api_key = os.environ.get("OPENAI_API_KEY")
 llm = ChatOpenAI(model="gpt-4o", api_key=api_key)
 
 class ToolUse(BaseModel):
-    tool: Literal["RAGTool", "NoTool", "WikipediaTool"] = Field(
+    tool: Literal["RAGTool", "NoTool", "WikipediaTool", "WebSearchTool"] = Field(
         description="Decide whether to use any given tools or no tool at all if you feel none is necessary. " \
         "The RAGTool allows you to query a local repo to get understanding of what is happening with the code" \
+        "The WikipediaTool allows you to search wikipedia for any information you need to know"\
+        "The WebSearchTool allows you to search for any current events and news"\
+        "The Python"
         "Type NoTool if you feel no tool is necessary"
     )
 
@@ -59,6 +63,14 @@ def WikipediaToolCall(state: State):
         return {"additionalContext": result}
     except Exception as e:
         return {"additionalContext": f"[WikipediaToolError] : {str(e)}"}
+
+def WebSearchToolCall(state: State):
+    try:
+        query = state["input"]
+        result = tool_instances["ddg_search"](query)
+        return {"additionalContext": result}
+    except Exception as e:
+        return {"additionalContext": f"[WebSearchToolError] : {str(e)}"}
     
 def llm_call_router(state: State):
     decision = tool_caller.invoke(
@@ -67,6 +79,7 @@ def llm_call_router(state: State):
                 content="Decide whether to use any given tools or no tool at all if you feel none is necessary. " \
                 "The RAGTool allows you to query a local repo to get understanding of what is happening with the code" \
                 "The WikipediaTool allows you to search wikipedia for any information you need to know" \
+                "The WebSearchTool allows you to search for any current events and news" \
                 "Type NoTool if you feel no tool is necessary"
             ),
             HumanMessage(content=state['input'])
@@ -90,6 +103,8 @@ def route_decision(state: State):
         return "NoTool"
     elif state["tool"] == "WikipediaTool":
         return "WikipediaTool"
+    elif state["tool"] == "WebSearchTool":
+        return "WebSearchTool"
     
     
 router_builder = StateGraph(State)
@@ -97,6 +112,7 @@ router_builder = StateGraph(State)
 router_builder.add_node("RAGToolCall", RAGToolCall)
 router_builder.add_node("NoToolCall", NoToolCall)
 router_builder.add_node("WikipediaToolCall", WikipediaToolCall)
+router_builder.add_node("WebSearchToolCall", WebSearchToolCall)
 router_builder.add_node("llm_call_router", llm_call_router)
 router_builder.add_node("synthesizer", synthesizer)
 
@@ -108,18 +124,20 @@ router_builder.add_conditional_edges(
     {
         "RAGTool": "RAGToolCall",
         "NoTool": "NoToolCall",
-        "WikipediaTool": "WikipediaToolCall"
+        "WikipediaTool": "WikipediaToolCall",
+        "WebSearchTool": "WebSearchToolCall"
     }
 )
 router_builder.add_edge("RAGToolCall", "synthesizer")
 router_builder.add_edge("NoToolCall", "synthesizer")
 router_builder.add_edge("WikipediaToolCall", "synthesizer")
+router_builder.add_edge("WebSearchToolCall", "synthesizer")
 router_builder.add_edge("synthesizer", END)
 
 router_workflow = router_builder.compile()
-output = router_workflow.invoke({"input":"How is reinforcement Learning used in the geometry dash repo"})
+output = router_workflow.invoke({"input":"Who is in the NBA Finals this year"})
 
-#print(output["output"].content)
+print(output["output"].content)
 
 
 def run_agent(input: str):
