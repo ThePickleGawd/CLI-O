@@ -1,0 +1,17 @@
+{
+  "responses": {
+    "What's the weather like in San Francisco today?": "The weather in San Francisco is currently sunny with temperatures ranging from 60\u00b0F to 75\u00b0F. It might be breezy too.",
+    "Who won the Super Bowl this year?": "I'm sorry, I couldn't find information about the current weather in San Francisco. For accurate local weather updates, you can check a reliable news source or a weather app."
+  },
+  "timing": {
+    "individual": {
+      "What's the weather like in San Francisco today?": 3.515974998474121,
+      "Who won the Super Bowl this year?": 7.610142946243286
+    },
+    "averages": {
+      "other": 5.563058972358704
+    },
+    "total_questions": 100,
+    "total_time": 11.126117944717407
+  }
+}

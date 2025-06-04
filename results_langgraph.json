@@ -1,0 +1,17 @@
+{
+  "responses": {
+    "What's the weather like in San Francisco today?": "The weather in San Francisco can vary quite a bit depending on the time of year. Typically, it's mild and pleasant year-round. In summer (June through August), expect warm days and cool nights, with temperatures around 60-75 degrees Celsius. Spring and fall have more moderate temperatures, averaging between 18-23 degrees Celsius during the day. For specific details, checking local forecasts would be best.",
+    "Who won the Super Bowl this year?": "Based on the information provided, the Super Bowl LIX was played on February 10, 2020, where the National Football Conference (NFC) champion Philadelphia Eagles defeated the American Football Conference (AFC) and two-time defending Super Bowl champion Kansas City Chiefs with a score of 40-22. This result denied the Chiefs an unprecedented three consecutive Super Bowl titles. The Eagles secured their first Super Bowl title since Super Bowl LII seven years earlier and their second overall. Jalen Hurts, the Eagles' quarterback, led the team with 17 of 22 passes for 221"
+  },
+  "timing": {
+    "individual": {
+      "What's the weather like in San Francisco today?": 7.862861156463623,
+      "Who won the Super Bowl this year?": 17.02408528327942
+    },
+    "averages": {
+      "other": 12.443473219871521
+    },
+    "total_questions": 100,
+    "total_time": 24.886946439743042
+  }
+}
