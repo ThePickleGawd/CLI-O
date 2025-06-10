@@ -5,7 +5,7 @@ from langchain_community.tools import DuckDuckGoSearchRun, WikipediaQueryRun
 from langchain_experimental.tools.python.tool import PythonREPLTool
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_core.tools import Tool
-from rag import *
+from utils.rag import *
 
 
 github_url = "https://github.com/ThePickleGawd/geometry-dash-ai"

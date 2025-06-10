@@ -9,7 +9,7 @@ from llama_index.core.settings import Settings
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import PromptTemplate
 
-from util import *
+from utils.util import *
 #from IPython.display import Markdown, display
 
 

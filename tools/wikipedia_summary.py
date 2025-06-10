@@ -49,8 +49,8 @@ class WikipediaSummary(ToolABC):
                     )
 
                 except (
-                    self.wiki_client.exceptions.PageError,
-                    self.wiki_client.exceptions.DisambiguationError,
+                    self.wikipedia_client.exceptions.PageError,
+                    self.wikipedia_client.exceptions.DisambiguationError,
                 ):
                     continue
             return "\n".join(pages)
