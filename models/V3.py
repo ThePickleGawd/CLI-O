@@ -1,0 +1,194 @@
+import json
+import re
+from langchain_community.chat_models import ChatOllama
+from langchain_core.tools import Tool
+from pydantic import BaseModel, Field
+from typing_extensions import Literal, TypedDict
+from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.graph import StateGraph, START, END
+from langchain_openai import ChatOpenAI
+from langchain_community.utilities import WikipediaAPIWrapper
+from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
+from transformers import TextIteratorStreamer
+
+
+from utils.rag import *
+from tools import tool_instances
+
+github_url = "https://github.com/ThePickleGawd/geometry-dash-ai"
+
+query_engine = setup_query_engine(github_url=github_url)
+
+retriever = query_engine.retriever
+retriever.similarity_top_k = 8
+
+wiki_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
+
+api_key = os.environ.get("OPENAI_API_KEY")
+llm = ChatOpenAI(model="gpt-4o", api_key=api_key)
+
+class ToolUse(BaseModel):
+    tool: Literal["RAGTool", "NoTool", "WikipediaTool", "WebSearchTool"] = Field(
+        description="Decide whether to use any given tools or no tool at all if you feel none is necessary. " \
+        "The RAGTool allows you to query a local repo to get understanding of what is happening with the code" \
+        "The WikipediaTool allows you to search wikipedia for any information you need to know"\
+        "The WebSearchTool allows you to search for any current events and news"\
+        "The Python"
+        "Type NoTool if you feel no tool is necessary"
+    )
+
+tool_caller = llm.with_structured_output(ToolUse)
+
+class State(TypedDict):
+    input: str
+    tool: str
+    additionalContext: str
+    output: str
+    passed: bool
+    used_tools: list[str]
+
+def RAGToolCall(state: State):
+    try:
+        nodes = retriever.retrieve(state["input"])
+        context = "\n\n".join([node.node.get_content() for node in nodes])
+        return {"additionalContext": context}  
+    except Exception as e:
+        return {"additionalContext": f"[GithubRAGToolError] : {str(e)}"}
+    
+def NoToolCall(state: State):
+    return {"additionalContext": "No additional context needed"}
+
+def WikipediaToolCall(state: State):
+    try:
+        query=state["input"]
+        result=wiki_tool.run(query)
+        return {"additionalContext": result}
+    except Exception as e:
+        return {"additionalContext": f"[WikipediaToolError] : {str(e)}"}
+
+def WebSearchToolCall(state: State):
+    try:
+        query = state["input"]
+        result = tool_instances["ddg_search"](query)
+        return {"additionalContext": result}
+    except Exception as e:
+        return {"additionalContext": f"[WebSearchToolError] : {str(e)}"}
+    
+def llm_call_router(state: State):
+    already_used = state.get("used_tools", [])
+    
+    decision = tool_caller.invoke([
+        SystemMessage(
+            content="Decide whether to use any given tools or no tool at all if you feel none is necessary. "
+                    f"Don't choose tools already used: {already_used}"
+        ),
+        HumanMessage(content=f"Query: {state['input']} + Current Output: {state.get('output', '')}")
+    ])
+    
+    return {
+        "tool": decision.tool,
+        "used_tools": already_used + [decision.tool],
+        "additionalContext": ""  
+    }
+
+def synthesizer(state: State): 
+    final_output = llm.invoke(
+        [
+            SystemMessage(content="Write a final answer given the query and additional context. Make sure the response in concise. 2-3 sentences Maximum"),
+            HumanMessage(content=f"Query: {state['input']} \n Context: {state['additionalContext']}")
+        ]
+    )
+    return {"output": final_output}
+
+def route_decision(state: State):
+    if state["tool"] == "RAGTool":
+        return "RAGTool"
+    elif state["tool"] == "NoTool":
+        return "NoTool"
+    elif state["tool"] == "WikipediaTool":
+        return "WikipediaTool"
+    elif state["tool"] == "WebSearchTool":
+        return "WebSearchTool"
+
+
+class SatisfactionCheck(BaseModel):
+    is_satisfactory: Literal[True, False] = Field(
+        description="Set to True if the current answer is satisfactory and needs no further improvement. "
+                    "Set to False if the answer is unclear, incomplete, or could benefit from further tool use."
+    )
+
+gate_llm = llm.with_structured_output(SatisfactionCheck)
+
+def gate(state: State):
+    response = gate_llm.invoke([
+        SystemMessage(
+            content="Given the input query and the answer, determine whether the answer is satisfactory. "
+                    "Only return False if the response could be meaningfully improved with tool use."
+        ),
+        HumanMessage(
+            content=f"Query: {state.get('input', '')}\nOutput: {state.get('output', '')}"
+        )
+    ])
+    
+    return {"passed": response.is_satisfactory}
+
+def gate_decision(state: State):
+    if state["passed"] == True:
+        return "END"
+    else: 
+        return "LLM_CALL_ROUTER"
+
+
+
+    
+    
+router_builder = StateGraph(State)
+
+router_builder.add_node("RAGToolCall", RAGToolCall)
+router_builder.add_node("NoToolCall", NoToolCall)
+router_builder.add_node("WikipediaToolCall", WikipediaToolCall)
+router_builder.add_node("WebSearchToolCall", WebSearchToolCall)
+router_builder.add_node("llm_call_router", llm_call_router)
+router_builder.add_node("synthesizer", synthesizer)
+router_builder.add_node("gate", gate)
+
+
+router_builder.add_edge(START, "llm_call_router")
+router_builder.add_conditional_edges(
+    "llm_call_router", 
+    route_decision, 
+    {
+        "RAGTool": "RAGToolCall",
+        "NoTool": "NoToolCall",
+        "WikipediaTool": "WikipediaToolCall",
+        "WebSearchTool": "WebSearchToolCall"
+    }
+)
+router_builder.add_edge("RAGToolCall", "synthesizer")
+router_builder.add_edge("NoToolCall", "synthesizer")
+router_builder.add_edge("WikipediaToolCall", "synthesizer")
+router_builder.add_edge("WebSearchToolCall", "synthesizer")
+router_builder.add_edge("synthesizer", "gate")
+router_builder.add_conditional_edges(
+    "gate",
+    gate_decision, 
+    {
+        "END": END, 
+        "LLM_CALL_ROUTER": "llm_call_router"
+    }
+
+)
+
+router_workflow = router_builder.compile()
+output = router_workflow.invoke({"input":"Who is in the NBA Finals this year"})
+
+print(output["output"].content)
+
+
+def run_agent(input: str):
+    output = router_workflow.invoke({"input": input})
+    return output["output"].content
+
+
+
+    
