@@ -10,9 +10,9 @@ A fully local speech-to-speech AI pipeline combining real-time speech recognitio
 User Speech → STT → LLM (Tool-Augmented) → TTS → Audio Response
 ```
 
-- **STT**: Converts audio into text (e.g., [RealtimeSTT](https://github.com/KoljaB/RealtimeSTT))
+- **STT**: Converts audio into text ([RealtimeSTT](https://github.com/KoljaB/RealtimeSTT))
 - **LLM + Tools**: Text input is processed by a local LLM (in `models/`) which can invoke external tools (from `tools/`)
-- **TTS**: Streams the LLM response as audio (e.g., [RealtimeTTS](https://github.com/KoljaB/RealtimeTTS))
+- **TTS**: Streams the LLM response as audio ([RealtimeTTS](https://github.com/KoljaB/RealtimeTTS))
 
 ![Models](/docs/models.png)
 
@@ -27,16 +27,16 @@ cd realtime-speech-agents
 uv sync
 ```
 
+## Running the Agent
+
+```bash
+uv run models/V1.py
+```
+
 ## Models
 
 - `V1.py`, `V2.py`, `V3.py`: Variants of the core speech agent models.
 - Includes LLM orchestration logic, response synthesis, and tool invocation.
 - See paper for more details
-
-## ▶️ Running the Agent
-
-```bash
-uv run models/V1.py
-```
 
 Speak into the mic — your agent will respond in real time.
